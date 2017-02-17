@@ -1,16 +1,25 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :redirect_unless_logged_in, only: [:show, :edit]
 
   # GET /users
   # GET /users.json
   def index
     @users = User.all
+
+    @message = if session[:id] == 1
+      "You are logged In"
+    else
+      "Please log in."
+    end
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
+    # render :show
   end
+  # redirect_to root_path unless is_logged_in?     - Can all be on 1 line. root_path is homepage
 
   # GET /users/new
   def new
@@ -62,13 +71,19 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def user_params
-      params.require(:user).permit(:name, :email)
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def user_params
+    params.require(:user).permit(:name, :email)
+  end
+
+  def redirect_unless_logged_in
+    unless is_logged_in?
+      redirect_to users_url
     end
+  end
 end
